@@ -36,7 +36,9 @@ public class Game extends Thread {
 	 public void run() {
 		 while(!stop){
 		 	System.out.println("This is mode: " + mode);
-		 	if (mode == 0) {
+		 	if (mode == -1){
+		 		stopGame();
+			} else if (mode == 0) {
 		 		runNormalMode();
 			} else if (mode == 1) {
 				runHamiltonianMode(Algorithms.hamiltonianCycle(App.width, App.height, false));

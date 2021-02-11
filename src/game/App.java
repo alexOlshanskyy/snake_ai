@@ -13,8 +13,8 @@ class App extends JFrame{
 	public static int colorRange = 1380;
 	public static float colorChange = (float)0.0005;
 	public static ArrayList<ArrayList<Box>> Grid;
-	public static int width = 6;
-	public static int height = 5;
+	public static int width = 45;
+	public static int height = 30;
 	public static JPanel grid = new JPanel();
 	public static MoveListener mv = new MoveListener();
 	public Game c;
