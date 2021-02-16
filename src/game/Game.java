@@ -13,7 +13,7 @@ public class Game extends Thread {
 	 public static boolean stop = false;
 
 	 ArrayList<Coordinate> positions = new ArrayList<Coordinate>();
-	 Coordinate foodPosition;
+	 public Coordinate foodPosition;
 	 
 	 //Constructor of ControlleurThread 
 	 Game(Coordinate positionStart, int mode){

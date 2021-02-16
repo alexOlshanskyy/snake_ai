@@ -4,9 +4,47 @@ import java.util.*;
 
 public class Algorithms {
     private static Random r = new Random();
-    public static void main(String[] args) {
-        System.out.println(Arrays.toString(hamiltonianCycle(6, 5, true))); // should result in even number otherwise hamiltonian cycle is not possible
+
+    private static class PQPair implements Comparable<PQPair> {
+        Coordinate c;
+        int value;
+        PQPair(Coordinate c, int value) {
+            this.c = c;
+            this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            PQPair pqPair = (PQPair) o;
+            return value == pqPair.value &&
+                    c.equals(pqPair.c);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(c, value);
+        }
+
+        @Override
+        public int compareTo(PQPair other) {
+            return this.value - other.value;
+        }
     }
+
+    public static void main(String[] args) {
+        ArrayList<Coordinate> positions = new ArrayList<>();
+        positions.add(new Coordinate(0,0));
+        positions.add(new Coordinate(1,0));
+        positions.add(new Coordinate(2,0));
+        positions.add(new Coordinate(3,0));
+        Coordinate head = new Coordinate(0,0);
+        Coordinate food = new Coordinate(3,3);
+        aStartSearch(positions, head, food, 4, 4);
+        //System.out.println(Arrays.toString(hamiltonianCycle(6, 5, true))); // should result in even number otherwise hamiltonian cycle is not possible
+    }
+
 
     public static int[] hamiltonianCycle(int x, int y, boolean random){
         Random r = new Random();
@@ -17,6 +55,58 @@ public class Algorithms {
         Stack<Coordinate> coordinates = new Stack<>();
 
         return findH(current, currLen, x, y, new int[x*y], coordinates, random);
+    }
+
+    public static int[] aStartSearch(ArrayList<Coordinate> positions, Coordinate headSnakePos, Coordinate foodPosition, int x, int y) {
+        PriorityQueue<PQPair> pq = new PriorityQueue<>();
+        HashSet<Coordinate> visited = new HashSet<>();
+        HashMap<Coordinate, Coordinate> map = new HashMap<>();
+        PQPair p = new PQPair(headSnakePos, 0);
+        pq.add(p);
+        map.put(headSnakePos, new Coordinate(-1,-1));
+        while (!pq.isEmpty()) {
+            System.out.println("here " + visited + pq);
+            PQPair current = pq.poll();
+            if (visited.contains(current.c)) {
+                continue;
+            }
+            if (current.c.equals(foodPosition)) {
+                break;
+            }
+            visited.add(current.c);
+            ArrayList<Coordinate> neighbors = getNeighbors(current.c);
+            for (int i = 0; i < neighbors.size(); i++) {
+                System.out.println("here1");
+                if (positions.contains(neighbors.get(i)) || outOfBounds(x, y, neighbors.get(i).getX(), neighbors.get(i).getY())) {
+                    neighbors.remove(neighbors.get(i));
+                    i--;
+                }
+            }
+            for (Coordinate cor : neighbors) {
+                System.out.println("here2");
+                if (!visited.contains(cor)) {
+                    pq.add(new PQPair(cor, current.value+1 + distance(cor, foodPosition)));
+                    map.put(cor, current.c);
+                }
+
+            }
+
+        }
+        Coordinate temp;
+        ArrayList<Coordinate> result = new ArrayList<>();
+        result.add(foodPosition);
+        temp = map.get(foodPosition);
+        while (!temp.equals(new Coordinate(-1,-1))) {
+            result.add(temp);
+            temp = map.get(temp);
+        }
+        System.out.println(result);
+
+        return new int[1];
+    }
+
+    private static int distance(Coordinate c1, Coordinate c2) {
+        return c1.getManhattanDistanceTo(c2);
     }
 
     private static int[] findH(Coordinate current, int currLen, int x, int y, int[] res, Stack<Coordinate> coordinates, boolean random) {
@@ -72,7 +162,8 @@ public class Algorithms {
             }
         }
         return res;
-        }
+    }
+
     // 1 right 2 left 3 top 4 bottom
     // return the move if it is, otherwise return -1
     private static int move(int x1, int y1, int x2, int y2) {
