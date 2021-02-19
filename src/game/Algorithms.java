@@ -1,6 +1,7 @@
 package game;
 
 import java.util.*;
+import java.util.zip.CheckedOutputStream;
 
 public class Algorithms {
     private static Random r = new Random();
@@ -8,9 +9,11 @@ public class Algorithms {
     private static class PQPair implements Comparable<PQPair> {
         Coordinate c;
         int value;
-        PQPair(Coordinate c, int value) {
+        ArrayList<Coordinate> positions;
+        PQPair(Coordinate c, int value, ArrayList<Coordinate> positions) {
             this.c = c;
             this.value = value;
+            this.positions = positions;
         }
 
         @Override
@@ -35,10 +38,12 @@ public class Algorithms {
 
     public static void main(String[] args) {
         ArrayList<Coordinate> positions = new ArrayList<>();
+        positions.add(new Coordinate(3,1));
+        positions.add(new Coordinate(2,1));
+        //positions.add(new Coordinate(0,1));
+        positions.add(new Coordinate(1,1));
+        positions.add(new Coordinate(0,1));
         positions.add(new Coordinate(0,0));
-        positions.add(new Coordinate(1,0));
-        positions.add(new Coordinate(2,0));
-        positions.add(new Coordinate(3,0));
         Coordinate head = new Coordinate(0,0);
         Coordinate food = new Coordinate(3,3);
         aStartSearch(positions, head, food, 4, 4);
@@ -58,34 +63,39 @@ public class Algorithms {
     }
 
     public static int[] aStartSearch(ArrayList<Coordinate> positions, Coordinate headSnakePos, Coordinate foodPosition, int x, int y) {
+        if (positions.isEmpty()) {
+            return new int[0];
+        }
         PriorityQueue<PQPair> pq = new PriorityQueue<>();
         HashSet<Coordinate> visited = new HashSet<>();
         HashMap<Coordinate, Coordinate> map = new HashMap<>();
-        PQPair p = new PQPair(headSnakePos, 0);
+        PQPair p = new PQPair(headSnakePos, 0, positions);
         pq.add(p);
         map.put(headSnakePos, new Coordinate(-1,-1));
         while (!pq.isEmpty()) {
-            System.out.println("here " + visited + pq);
             PQPair current = pq.poll();
             if (visited.contains(current.c)) {
                 continue;
             }
             if (current.c.equals(foodPosition)) {
+                // check if can get to many cells
                 break;
             }
             visited.add(current.c);
             ArrayList<Coordinate> neighbors = getNeighbors(current.c);
             for (int i = 0; i < neighbors.size(); i++) {
-                System.out.println("here1");
-                if (positions.contains(neighbors.get(i)) || outOfBounds(x, y, neighbors.get(i).getX(), neighbors.get(i).getY())) {
+                if (current.positions.contains(neighbors.get(i)) || outOfBounds(x, y, neighbors.get(i).getX(), neighbors.get(i).getY())) {
                     neighbors.remove(neighbors.get(i));
                     i--;
                 }
             }
             for (Coordinate cor : neighbors) {
-                System.out.println("here2");
                 if (!visited.contains(cor)) {
-                    pq.add(new PQPair(cor, current.value+1 + distance(cor, foodPosition)));
+                    int move = move(current.c.getX(), current.c.getY(), cor.getX(), cor.getY());
+                    ArrayList<Coordinate> newPositions = new ArrayList<>(current.positions);
+                    deleteTail(newPositions);
+                    addNewHead(move, newPositions);
+                    pq.add(new PQPair(cor, current.value+1 + distance(cor, foodPosition), newPositions));
                     map.put(cor, current.c);
                 }
 
@@ -96,13 +106,18 @@ public class Algorithms {
         ArrayList<Coordinate> result = new ArrayList<>();
         result.add(foodPosition);
         temp = map.get(foodPosition);
-        while (!temp.equals(new Coordinate(-1,-1))) {
+        while (temp != null && !temp.equals(new Coordinate(-1,-1))) {
             result.add(temp);
             temp = map.get(temp);
         }
-        System.out.println(result);
-
-        return new int[1];
+        int[] ret = new int[result.size()-1];
+        for (int i = 0; i < result.size()-1; i++) {
+            Coordinate c1 = result.get(i);
+            Coordinate c2 = result.get(i+1);
+            ret[result.size() - 2 - i] = move(c2.getX(), c2.getY(), c1.getX(), c1.getY());
+        }
+        System.out.println(Arrays.toString(ret));
+        return ret;
     }
 
     private static int distance(Coordinate c1, Coordinate c2) {
@@ -111,7 +126,6 @@ public class Algorithms {
 
     private static int[] findH(Coordinate current, int currLen, int x, int y, int[] res, Stack<Coordinate> coordinates, boolean random) {
         if (currLen == (x*y)) {
-            System.out.println("base");
             System.out.println(Arrays.toString(res));
             return res;
         } else {
@@ -131,7 +145,6 @@ public class Algorithms {
                 if (random){
                     Collections.shuffle(valid);
                 }
-                System.out.println("valid: " + valid.toString());
                 for (Coordinate c : valid){
                     res[currLen] = move(current.getX(), current.getY(), c.getX(), c.getY());
                    // System.out.println("In loop");
@@ -196,6 +209,36 @@ public class Algorithms {
         res.add(new Coordinate(curr.getX() - 1, curr.getY()));
         res.add(new Coordinate(curr.getX(), curr.getY() - 1));
         return res;
+    }
+
+    private static void addNewHead(int dir, ArrayList<Coordinate> positions){
+        Coordinate head = positions.get(positions.size()-1);
+        switch(dir){
+            case 4:
+                positions.add(new Coordinate(head.getX(), head.getY()+1));
+                break;
+            case 3:
+                positions.add(new Coordinate(head.getX(), head.getY()-1));
+                break;
+            case 2:
+                positions.add(new Coordinate(head.getX()-1, head.getY()));
+                break;
+            case 1:
+                positions.add(new Coordinate(head.getX()+1, head.getY()));
+        }
+    }
+
+
+    private static void deleteTail(ArrayList<Coordinate> positions){
+        int size = positions.size()-1;
+        for(int i = positions.size()-1;i>=0;i--){
+            if(size==0){
+                positions.remove(i);
+            }
+            else{
+                size--;
+            }
+        }
     }
 
 }

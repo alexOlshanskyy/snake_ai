@@ -1,6 +1,7 @@
 package game;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class Main {
 
@@ -12,5 +13,6 @@ public class Main {
 		app.setVisible(true);
 		app.setResizable(false);
 		app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		app.setBackground(Color.white);
 	}
 }

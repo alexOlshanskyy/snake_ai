@@ -32,10 +32,20 @@ class App extends JFrame{
 			width = 45;
 			height = 30;
 			Game.speed = 3;
+			colorRange = 1380;
+			colorChange = (float)0.0005;
 		} else if (mode == 0) {
 			width = 45;
 			height = 30;
 			Game.speed = 250;
+			colorRange = 1380;
+			colorChange = (float)0.0005;
+		} else if (mode == 3) {
+			width = 45;
+			height = 30;
+			Game.speed = 30;
+			colorRange = 1380;
+			colorChange = (float)0.0005;
 		}
 		Grid = new ArrayList<>();
 		ArrayList<Box> data;
@@ -73,7 +83,7 @@ class App extends JFrame{
 
 
 		JPanel grid2 = new JPanel();
-		grid2.setLayout(new FlowLayout());
+		grid2.setLayout(new GridLayout(1,5,10,0));
 		JButton normalGameButton = new JButton("Normal Game");
 		normalGameButton.setBackground(Color.white);
 		normalGameButton.addActionListener(e -> {
@@ -95,14 +105,38 @@ class App extends JFrame{
 		});
 
 
-		JButton button2 = new JButton("Click Me 2");
+		JButton pathfinding = new JButton("Pathfinding");
+		pathfinding.setBackground(Color.white);
+		pathfinding.addActionListener(e -> {
+			// do something
+			recreateSnake(true, 3);
+		});
+
+		JTextArea textArea = new JTextArea();
+		textArea.setText("Score: 0");
+		textArea.setSize(20, 100);
+		Font font = new Font("Georgia", Font.BOLD, 20);
+		textArea.setFont(font);
+		textArea.setBackground(Color.getHSBColor(249, (float)0, (float)0.93));
+		JTextArea textArea2 = new JTextArea();
+		textArea2.setText("    ");
+		textArea2.setSize(20, 100);
+		textArea2.setEditable(false);
+		Font font1 = new Font("Georgia", Font.BOLD, 20);
+		textArea2.setFont(font1);
+		textArea2.setBackground(Color.getHSBColor(249, (float)0, (float)0.93));
+		grid2.add(textArea2);
+		textArea2.setEditable(false);
 		grid2.add(normalGameButton);
 		grid2.add(hamiltonianButton);
 		grid2.add(hamiltonianButtonS);
-		grid2.add(button2);
+		grid2.add(pathfinding);
+		grid2.add(textArea);
+
 		m.add(grid, BorderLayout.CENTER);
 		m.add(grid2, BorderLayout.PAGE_END);
 		setContentPane(m);
+		//setBackground(Color.white);
 
 		// initial position of the snake
 		Coordinate position = new Coordinate(0,0);
@@ -111,7 +145,7 @@ class App extends JFrame{
 			//Game.stop = true;
 			c.stop();
 		}
-		c = new Game(position, mode);
+		c = new Game(position, mode, textArea);
 		Game.stop = false;
 
 		c.start();

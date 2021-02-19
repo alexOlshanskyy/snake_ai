@@ -1,5 +1,6 @@
 package game;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 
@@ -11,15 +12,16 @@ public class Game extends Thread {
 	 public static int directionSnake;
 	 private static int mode;
 	 public static boolean stop = false;
+	 private static JTextArea ta;
 
 	 ArrayList<Coordinate> positions = new ArrayList<Coordinate>();
 	 public Coordinate foodPosition;
 	 
 	 //Constructor of ControlleurThread 
-	 Game(Coordinate positionStart, int mode){
-	 	reconstruct(positionStart, mode);
+	 Game(Coordinate positionStart, int mode, JTextArea textArea){
+	 	reconstruct(positionStart, mode, textArea);
 	 }
-	 public void reconstruct(Coordinate positionStart, int mode) {
+	 public void reconstruct(Coordinate positionStart, int mode, JTextArea textArea) {
 		 Game.mode = mode;
 		 Squares= App.Grid;
 
@@ -31,6 +33,8 @@ public class Game extends Thread {
 
 		 foodPosition= new Coordinate(App.width-1, App.height-1);
 		 spawnFood(foodPosition);
+		 ta = textArea;
+		 //ta.setText("Score: " + sizeSnake);
 	 }
 
 	 public void run() {
@@ -44,9 +48,33 @@ public class Game extends Thread {
 				runHamiltonianMode(Algorithms.hamiltonianCycle(App.width, App.height, false));
 			} else if (mode == 2) {
 				runHamiltonianMode(Algorithms.hamiltonianCycle(App.width, App.height, true));
+			} else if (mode == 3) {
+		 		runPathFinding();
 			}
 		 }
 	 }
+
+	private void runPathFinding() {
+		moveInterne(directionSnake);
+		checkForCollision();
+		moveExterne();
+		deleteTail();
+		pauser();
+		while(!stop){
+			int[] moves = Algorithms.aStartSearch(positions, headSnakePos, foodPosition, App.width, App.height);
+			if (moves.length == 0) {
+				runNormalMode();  // no moves can be found
+			}
+			for (int i = 0; i < moves.length; i++) {
+				directionSnake = moves[i];
+				moveInterne(directionSnake);
+				checkForCollision();
+				moveExterne();
+				deleteTail();
+				pauser();
+			}
+		}
+	}
 
 	 private void runNormalMode() {
 		 while(!stop){
@@ -92,6 +120,7 @@ public class Game extends Thread {
 		 if(eatingFood){
 
 			 sizeSnake=sizeSnake+1;
+			 ta.setText("Score: " + sizeSnake);
 			 System.out.println("got food");
 			 foodPosition = getRandNotInSnake();
 			 spawnFood(foodPosition);
@@ -131,12 +160,18 @@ public class Game extends Thread {
 		 int ranY= 0 + (int)(Math.random()*App.height);
 		 p=new Coordinate(ranX,ranY);
 		 // make sure it is not on the snake
-		 for(int i = 0;i<=positions.size()-1;i++){
-			 if(p.getX()==positions.get(i).getX() && p.getY()==positions.get(i).getY()){
-				 ranX= 0 + (int)(Math.random()*App.width);
-				 ranY= 0 + (int)(Math.random()*App.height);
-				 p=new Coordinate(ranX,ranY);
-				 i=0;
+		 boolean found = false;
+		 while (!found) {
+		 	found = true;
+			 for(int i = 0;i<=positions.size()-1;i++){
+				 if(p.getX()==positions.get(i).getX() && p.getY()==positions.get(i).getY()){
+					 ranX= 0 + (int)(Math.random()*App.width);
+					 ranY= 0 + (int)(Math.random()*App.height);
+					 p=new Coordinate(ranX,ranY);
+					 i=0;
+					 found = false;
+					 break;
+				 }
 			 }
 		 }
 		 return p;
@@ -188,6 +223,7 @@ public class Game extends Thread {
 	 }
 
 	 private void moveExterne(){
+	 	System.out.println("here");
 
 		 for(int i = positions.size() - 1; i >= 0; i--){
 			 int x = positions.get(i).getX();
