@@ -13,6 +13,7 @@ public class Game extends Thread {
 	 private static int mode;
 	 public static boolean stop = false;
 	 private static JTextArea ta;
+	 public static boolean allowedToMove;
 
 	 ArrayList<Coordinate> positions = new ArrayList<Coordinate>();
 	 public Coordinate foodPosition;
@@ -55,15 +56,25 @@ public class Game extends Thread {
 	 }
 
 	private void runPathFinding() {
+	 	//boolean max = false;
 		moveInterne(directionSnake);
 		checkForCollision();
 		moveExterne();
 		deleteTail();
 		pauser();
 		while(!stop){
-			int[] moves = Algorithms.aStartSearch(positions, headSnakePos, foodPosition, App.width, App.height);
+			int[] moves = Algorithms.aStartSearch(positions, headSnakePos, foodPosition, App.width, App.height, false, false);
 			if (moves.length == 0) {
-				runNormalMode();  // no moves can be found
+				System.out.println("No shortest path found");
+				moves = Algorithms.aStartSearch(positions, headSnakePos, foodPosition, App.width, App.height, true, false);
+			}
+			if (moves.length == 0) {
+				System.out.println("No longest path found");
+				moves = Algorithms.aStartSearch(positions, headSnakePos, foodPosition, App.width, App.height, true, true);
+			}
+			if (moves.length == 0) {
+				System.out.println("No path found, RIP");
+				runNormalMode();
 			}
 			for (int i = 0; i < moves.length; i++) {
 				directionSnake = moves[i];
@@ -78,7 +89,9 @@ public class Game extends Thread {
 
 	 private void runNormalMode() {
 		 while(!stop){
-			 moveInterne(directionSnake);
+		 	allowedToMove = true;
+		 	 int temp = directionSnake;
+			 moveInterne(temp);
 			 checkForCollision();
 			 moveExterne();
 			 deleteTail();
@@ -97,6 +110,7 @@ public class Game extends Thread {
 			 } else {
 			 	index++;
 			 }
+
 			 checkForCollision();
 			 moveExterne();
 			 deleteTail();
@@ -181,7 +195,6 @@ public class Game extends Thread {
 	 private void moveInterne(int dir){
 		 switch(dir){
 		 	case 4:
-		 		System.out.println('4');
 		 		if (headSnakePos.getY()+1 == App.height){
 					stopGame();
 				} else {
@@ -190,7 +203,6 @@ public class Game extends Thread {
 				}
 		 		break;
 		 	case 3:
-				System.out.println('3');
 		 		if(headSnakePos.getY()-1<0){
 					stopGame();
 		 		 }
@@ -201,7 +213,6 @@ public class Game extends Thread {
 
 		 		break;
 		 	case 2:
-				System.out.println('2');
 		 		 if(headSnakePos.getX()-1<0){
 					 stopGame();
 		 		 }
@@ -211,7 +222,6 @@ public class Game extends Thread {
 		 		 }
 		 		 break;
 		 	case 1:
-				System.out.println('1');
 				if (headSnakePos.getX()+1 == App.width){
 					stopGame();
 				} else {
@@ -223,7 +233,6 @@ public class Game extends Thread {
 	 }
 
 	 private void moveExterne(){
-	 	System.out.println("here");
 
 		 for(int i = positions.size() - 1; i >= 0; i--){
 			 int x = positions.get(i).getX();

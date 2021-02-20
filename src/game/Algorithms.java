@@ -1,5 +1,6 @@
 package game;
 
+import javax.print.attribute.HashAttributeSet;
 import java.util.*;
 import java.util.zip.CheckedOutputStream;
 
@@ -10,10 +11,14 @@ public class Algorithms {
         Coordinate c;
         int value;
         ArrayList<Coordinate> positions;
-        PQPair(Coordinate c, int value, ArrayList<Coordinate> positions) {
+        HashSet<Coordinate> visited;
+        HashMap<Coordinate, Coordinate> map;
+        PQPair(Coordinate c, int value, ArrayList<Coordinate> positions, HashSet<Coordinate> visited, HashMap<Coordinate, Coordinate> map) {
             this.c = c;
             this.value = value;
             this.positions = positions;
+            this.visited = visited;
+            this.map = map;
         }
 
         @Override
@@ -46,7 +51,7 @@ public class Algorithms {
         positions.add(new Coordinate(0,0));
         Coordinate head = new Coordinate(0,0);
         Coordinate food = new Coordinate(3,3);
-        aStartSearch(positions, head, food, 4, 4);
+        aStartSearch(positions, head, food, 4, 4, true, false);
         //System.out.println(Arrays.toString(hamiltonianCycle(6, 5, true))); // should result in even number otherwise hamiltonian cycle is not possible
     }
 
@@ -62,26 +67,45 @@ public class Algorithms {
         return findH(current, currLen, x, y, new int[x*y], coordinates, random);
     }
 
-    public static int[] aStartSearch(ArrayList<Coordinate> positions, Coordinate headSnakePos, Coordinate foodPosition, int x, int y) {
+    public static int[] aStartSearch(ArrayList<Coordinate> positions, Coordinate headSnakePos, Coordinate foodPosition, int x, int y, boolean max, boolean any) {
         if (positions.isEmpty()) {
             return new int[0];
         }
         PriorityQueue<PQPair> pq = new PriorityQueue<>();
+        // start finding longest path if size is big enough
+        if (max) {
+            pq = new PriorityQueue<PQPair>(new Comparator<PQPair>() {
+                public int compare(PQPair n1, PQPair n2) {
+                    return n2.value - n1.value;
+                }
+            });
+        }
         HashSet<Coordinate> visited = new HashSet<>();
         HashMap<Coordinate, Coordinate> map = new HashMap<>();
-        PQPair p = new PQPair(headSnakePos, 0, positions);
-        pq.add(p);
         map.put(headSnakePos, new Coordinate(-1,-1));
+        PQPair p = new PQPair(headSnakePos, 0, positions, visited, new HashMap<>(map));
+        pq.add(p);
+
+        boolean found = false;
         while (!pq.isEmpty()) {
             PQPair current = pq.poll();
-            if (visited.contains(current.c)) {
+            if (current.visited.contains(current.c)) {
                 continue;
             }
             if (current.c.equals(foodPosition)) {
                 // check if can get to many cells
-                break;
+                ArrayList<Coordinate> temp = new ArrayList<>(current.positions);
+                temp.add(foodPosition);
+                if (numberOfCellsCanReach(current.positions, x, y) <= 0.8 && !any){
+                    continue;
+                } else {
+                    System.out.println("Found");
+                    found = true;
+                    map = current.map;
+                    break;
+                }
             }
-            visited.add(current.c);
+            current.visited.add(current.c);
             ArrayList<Coordinate> neighbors = getNeighbors(current.c);
             for (int i = 0; i < neighbors.size(); i++) {
                 if (current.positions.contains(neighbors.get(i)) || outOfBounds(x, y, neighbors.get(i).getX(), neighbors.get(i).getY())) {
@@ -90,36 +114,84 @@ public class Algorithms {
                 }
             }
             for (Coordinate cor : neighbors) {
-                if (!visited.contains(cor)) {
-                    int move = move(current.c.getX(), current.c.getY(), cor.getX(), cor.getY());
-                    ArrayList<Coordinate> newPositions = new ArrayList<>(current.positions);
+                int move = move(current.c.getX(), current.c.getY(), cor.getX(), cor.getY());
+                ArrayList<Coordinate> newPositions = new ArrayList<>(current.positions);
+                if (!cor.equals(foodPosition)){
                     deleteTail(newPositions);
-                    addNewHead(move, newPositions);
-                    pq.add(new PQPair(cor, current.value+1 + distance(cor, foodPosition), newPositions));
-                    map.put(cor, current.c);
+                }
+                addNewHead(move, newPositions);
+                if (!current.visited.contains(cor)) {
+                    current.map.put(cor, current.c);
+                    HashMap<Coordinate,Coordinate> newMap = new HashMap<>(current.map);
+
+                    pq.add(new PQPair(cor, current.value+1 + distance(cor, foodPosition), newPositions, new HashSet<>(current.visited), newMap));
+
                 }
 
             }
 
         }
-        Coordinate temp;
-        ArrayList<Coordinate> result = new ArrayList<>();
-        result.add(foodPosition);
-        temp = map.get(foodPosition);
-        while (temp != null && !temp.equals(new Coordinate(-1,-1))) {
-            result.add(temp);
-            temp = map.get(temp);
+        if (found) {
+            Coordinate temp;
+            ArrayList<Coordinate> result = new ArrayList<>();
+            result.add(foodPosition);
+            temp = map.get(foodPosition);
+            while (temp != null && !temp.equals(new Coordinate(-1,-1))) {
+                result.add(temp);
+                temp = map.get(temp);
+            }
+            int[] ret = new int[result.size()-1];
+            for (int i = 0; i < result.size()-1; i++) {
+                Coordinate c1 = result.get(i);
+                Coordinate c2 = result.get(i+1);
+                ret[result.size() - 2 - i] = move(c2.getX(), c2.getY(), c1.getX(), c1.getY());
+            }
+            System.out.println(Arrays.toString(ret));
+            return ret;
         }
-        int[] ret = new int[result.size()-1];
-        for (int i = 0; i < result.size()-1; i++) {
-            Coordinate c1 = result.get(i);
-            Coordinate c2 = result.get(i+1);
-            ret[result.size() - 2 - i] = move(c2.getX(), c2.getY(), c1.getX(), c1.getY());
-        }
-        System.out.println(Arrays.toString(ret));
-        return ret;
+        return new int[0];
     }
 
+
+    private static double numberOfCellsCanReach(ArrayList<Coordinate> positions, int x, int y) {
+        if (positions.isEmpty()) {
+            return 1;  // if there is no snake
+        }
+        Queue<Coordinate> pq = new LinkedList<>();
+        // start finding longest path if size is big enough
+        HashSet<Coordinate> visited = new HashSet<>();
+        Coordinate p = positions.get(positions.size()-1);
+        pq.add(p);
+        while (!pq.isEmpty()) {
+            Coordinate current = pq.poll();
+            if (visited.contains(current)) {
+                continue;
+            }
+            visited.add(current);
+            ArrayList<Coordinate> neighbors = getNeighbors(current);
+            for (int i = 0; i < neighbors.size(); i++) {
+                if (positions.contains(neighbors.get(i)) || outOfBounds(x, y, neighbors.get(i).getX(), neighbors.get(i).getY())) {
+                    neighbors.remove(i);
+                    i--;
+                }
+            }
+            //System.out.println("Positions: " + positions);
+            //System.out.println(neighbors);
+            for (Coordinate cor : neighbors) {
+                if (!visited.contains(cor)) {
+                    pq.add(cor);
+                }
+
+            }
+
+        }
+        double result = (((visited.size()-1) *1.0) / ((x*y)-(positions.size())));
+        //System.out.println("Visited: " + visited);
+        //System.out.println("x*y: " + (x*y));
+        //System.out.println("Positions: " + positions.size());
+        System.out.println("Can reach: " + result);
+        return result;
+    }
     private static int distance(Coordinate c1, Coordinate c2) {
         return c1.getManhattanDistanceTo(c2);
     }

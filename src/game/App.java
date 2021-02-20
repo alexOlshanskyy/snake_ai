@@ -17,7 +17,7 @@ class App extends JFrame{
 	public static int height = 30;
 	public static JPanel grid = new JPanel();
 	public static MoveListener mv = new MoveListener();
-	public Game c;
+	public static Game c;
 	public App(int mode){
 		recreateSnake(false, mode);
 	}
@@ -26,8 +26,8 @@ class App extends JFrame{
 			width = 6;
 			height = 5;
 			Game.speed = 100;
-			colorChange = (float)0.03;
-			colorRange = 32;
+			colorChange = (float)0.02;
+			colorRange = 34;
 		} else if (mode == 1){
 			width = 45;
 			height = 30;
@@ -37,15 +37,15 @@ class App extends JFrame{
 		} else if (mode == 0) {
 			width = 45;
 			height = 30;
-			Game.speed = 250;
+			Game.speed = 150;
 			colorRange = 1380;
 			colorChange = (float)0.0005;
 		} else if (mode == 3) {
-			width = 45;
-			height = 30;
-			Game.speed = 30;
+			width = 7;
+			height = 6;
+			Game.speed = 100;
 			colorRange = 1380;
-			colorChange = (float)0.0005;
+			colorChange = (float)0.005;
 		}
 		Grid = new ArrayList<>();
 		ArrayList<Box> data;
@@ -67,7 +67,7 @@ class App extends JFrame{
 		m.setBorder(null);
 		grid.removeAll();
 		grid.setFocusable(true);
-		grid.setLayout(new GridLayout(height,width,2,2));
+		grid.setLayout(new GridLayout(height,width,0,0));
 
 
 
