@@ -13,8 +13,8 @@ class App extends JFrame{
 	public static int colorRange = 1380;
 	public static float colorChange = (float)0.0005;
 	public static ArrayList<ArrayList<Box>> Grid;
-	public static int width = 45;
-	public static int height = 30;
+	public static int width = 18;
+	public static int height = 12;
 	public static JPanel grid = new JPanel();
 	public static MoveListener mv = new MoveListener();
 	public static Game c;
@@ -29,15 +29,15 @@ class App extends JFrame{
 			colorChange = (float)0.02;
 			colorRange = 34;
 		} else if (mode == 1){
-			width = 45;
-			height = 30;
+			width = 18;
+			height = 12;
 			Game.speed = 3;
-			colorRange = 1380;
-			colorChange = (float)0.0005;
+			colorRange = 225;
+			colorChange = (float)0.003;
 		} else if (mode == 0) {
-			width = 45;
-			height = 30;
-			Game.speed = 150;
+			width = 18;
+			height = 12;
+			Game.speed = 100;
 			colorRange = 1380;
 			colorChange = (float)0.0005;
 		} else if (mode == 3) {
@@ -45,7 +45,7 @@ class App extends JFrame{
 			height = 6;
 			Game.speed = 100;
 			colorRange = 1380;
-			colorChange = (float)0.005;
+			colorChange = (float)0.01;
 		}
 		Grid = new ArrayList<>();
 		ArrayList<Box> data;

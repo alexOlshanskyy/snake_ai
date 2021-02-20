@@ -46,7 +46,7 @@ public class Game extends Thread {
 			} else if (mode == 0) {
 		 		runNormalMode();
 			} else if (mode == 1) {
-				runHamiltonianMode(Algorithms.hamiltonianCycle(App.width, App.height, false));
+				runHamiltonianShortcutMode(Algorithms.randomH);
 			} else if (mode == 2) {
 				runHamiltonianMode(Algorithms.hamiltonianCycle(App.width, App.height, true));
 			} else if (mode == 3) {
@@ -117,7 +117,27 @@ public class Game extends Thread {
 			 pauser();
 		 }
 	 }
-	 
+
+	private void runHamiltonianShortcutMode(int[] moves) {
+		int index = 0;
+		while(!stop){
+			directionSnake = moves[index];
+			System.out.println(directionSnake);
+			moveInterne(directionSnake);
+
+
+			checkForCollision();
+			moveExterne();
+			deleteTail();
+			if (index == moves.length -1){
+				index=0;
+			} else {
+				index++;
+			}
+			pauser();
+		}
+	}
+
 	 //delay between each move of the snake
 	 private void pauser(){
 		 try {
