@@ -42,7 +42,7 @@ class App extends JFrame{
 			colorChange = (float)0.0005;
 		} else if (mode == 3) {
 			width = 7;
-			height = 6;
+			height = 5;
 			Game.speed = 100;
 			colorRange = 1380;
 			colorChange = (float)0.01;
@@ -118,15 +118,15 @@ class App extends JFrame{
 		Font font = new Font("Georgia", Font.BOLD, 20);
 		textArea.setFont(font);
 		textArea.setBackground(Color.getHSBColor(249, (float)0, (float)0.93));
-		JTextArea textArea2 = new JTextArea();
-		textArea2.setText("    ");
-		textArea2.setSize(20, 100);
-		textArea2.setEditable(false);
+		JTextArea resultTextArea = new JTextArea();
+		resultTextArea.setText("    ");
+		resultTextArea.setSize(20, 100);
+		resultTextArea.setEditable(false);
 		Font font1 = new Font("Georgia", Font.BOLD, 20);
-		textArea2.setFont(font1);
-		textArea2.setBackground(Color.getHSBColor(249, (float)0, (float)0.93));
-		grid2.add(textArea2);
-		textArea2.setEditable(false);
+		resultTextArea.setFont(font1);
+		resultTextArea.setBackground(Color.getHSBColor(249, (float)0, (float)0.93));
+		grid2.add(resultTextArea);
+		resultTextArea.setEditable(false);
 		grid2.add(normalGameButton);
 		grid2.add(hamiltonianButton);
 		grid2.add(hamiltonianButtonS);
@@ -145,7 +145,7 @@ class App extends JFrame{
 			//Game.stop = true;
 			c.stop();
 		}
-		c = new Game(position, mode, textArea);
+		c = new Game(position, mode, textArea, resultTextArea);
 		Game.stop = false;
 
 		c.start();

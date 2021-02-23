@@ -14,16 +14,17 @@ public class Game extends Thread {
 	 private static int mode;
 	 public static boolean stop = false;
 	 private static JTextArea ta;
+	private static JTextArea resTA;
 	 public static boolean allowedToMove;
 
 	 ArrayList<Coordinate> positions = new ArrayList<Coordinate>();
 	 public Coordinate foodPosition;
 	 
 	 //Constructor of ControlleurThread 
-	 Game(Coordinate positionStart, int mode, JTextArea textArea){
-	 	reconstruct(positionStart, mode, textArea);
+	 Game(Coordinate positionStart, int mode, JTextArea textArea, JTextArea textArea2){
+	 	reconstruct(positionStart, mode, textArea, textArea2);
 	 }
-	 public void reconstruct(Coordinate positionStart, int mode, JTextArea textArea) {
+	 public void reconstruct(Coordinate positionStart, int mode, JTextArea textArea, JTextArea textArea2) {
 		 Game.mode = mode;
 		 Squares= App.Grid;
 
@@ -37,6 +38,7 @@ public class Game extends Thread {
 		 spawnFood(foodPosition);
 		 ta = textArea;
 		 //ta.setText("Score: " + sizeSnake);
+		 resTA = textArea2;
 	 }
 
 	 public void run() {
@@ -182,6 +184,12 @@ public class Game extends Thread {
 	 private void stopGame(){
 		 System.out.println("end \n");
 		 System.out.println(sizeSnake);
+		 if (sizeSnake == (App.width*App.height)) {
+			 resTA.setText("WON!");
+		 } else if (!(mode == -1)){
+			 resTA.setText("LOST!");
+		 }
+
 		 while(true){
 			 pauser();
 		 }
