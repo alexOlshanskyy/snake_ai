@@ -9,6 +9,64 @@ public class Algorithms {
     public static int[] randomH = new int[]{1,1,4,2,4,1,1,3,3,1,4,4,1,3,3,1,4,4,1,1,3,2,3,1,1,4,4,1,3,3,1,4,4,4,1,3,3,3,1,4,4,1,3,3,1,1,1,4,2,2,4,
             4,2,2,4,1,1,1,3,3,1,4,4,4,2,2,2,2,2,3,2,2,3,2,2,2,2,2,2,2,4,1,1,1,1,1,1,4,1,1,4,1,1,1,1,1,1,4,2,2,2,2,2,2,2,3,2,4,2,3,3,2,2,2,2,2,2,3,3,2,4,4,4,1,1,1,1,1,1,4,4,1,1,1,1,1,1,1,1,1,
             1,4,2,2,2,4,1,1,1,4,2,2,2,2,3,3,2,4,4,2,3,3,2,4,4,2,3,3,2,2,2,2,2,4,1,1,1,1,4,2,2,2,2,2,3,3,3,1,1,1,3,2,2,2,2,4,4,4,4,2,2,3,1,3,2,3,1,3,2,3,3,3,3,3,3,3};
+    private static ArrayList<Coordinate> cords = new ArrayList<>();
+
+    public static void buildCords() {
+        cords.clear();
+        Coordinate cur = new Coordinate(0,0);
+        cords.add(cur);
+        for (int i = 0; i < randomH.length; i++) {
+            cur = getCordFromMove(cur, randomH[i]);
+            cords.add(cur);
+        }
+    }
+
+    public static int[] getShortcutMove(int index, Coordinate food, ArrayList<Coordinate> positions) {
+        Coordinate c = cords.get(index);
+        ArrayList<Coordinate> n = getNeighbors(c);
+        if (n.contains(food)) {
+            int move = move(c.getX(), c.getY(), food.getX(), food.getY());
+            for (int i = 0; i < cords.size(); i++){
+                if (cords.get(i).equals(food)) {
+                    index = i;
+                    break;
+                }
+            }
+            int size = positions.size();
+            int idx = index;
+            while (size > 0) {
+                if (positions.contains(cords.get((++idx)%cords.size()))) {
+                    return new int[]{-1,-1};
+                }
+                size--;
+            }
+
+            return new int[]{move, index};
+        }
+        return new int[]{-1,-1};
+    }
+
+    private static boolean containsFood (Coordinate food, int start, int end) {
+        for (int i = start; i <= end; i++) {
+            if (cords.get(i).equals(food)){
+                return true;
+            }
+        }
+        return false;
+    }
+    private static Coordinate getCordFromMove(Coordinate cur, int move) {
+        if (move == 1) {
+            return new Coordinate(cur.getX()+1, cur.getY());
+        } else if (move == 2){
+            return new Coordinate(cur.getX()-1, cur.getY());
+        } else if (move == 3){
+            return new Coordinate(cur.getX(), cur.getY()-1);
+        } else if (move == 4){
+            return new Coordinate(cur.getX(), cur.getY()+1);
+        } else {
+            return null;
+        }
+    }
 
     private static class PQPair implements Comparable<PQPair> {
         Coordinate c;
@@ -22,6 +80,10 @@ public class Algorithms {
             this.positions = positions;
             this.visited = visited;
             this.map = map;
+        }
+        PQPair(Coordinate c, int value) {
+            this.c = c;
+            this.value = value;
         }
 
         @Override
@@ -45,16 +107,18 @@ public class Algorithms {
     }
 
     public static void main(String[] args) {
-        ArrayList<Coordinate> positions = new ArrayList<>();
-        positions.add(new Coordinate(3,1));
-        positions.add(new Coordinate(2,1));
-        //positions.add(new Coordinate(0,1));
-        positions.add(new Coordinate(1,1));
-        positions.add(new Coordinate(0,1));
-        positions.add(new Coordinate(0,0));
-        Coordinate head = new Coordinate(0,0);
-        Coordinate food = new Coordinate(3,3);
-        aStartSearch(positions, head, food, 4, 4, true, false);
+//        ArrayList<Coordinate> positions = new ArrayList<>();
+//        positions.add(new Coordinate(3,1));
+//        positions.add(new Coordinate(2,1));
+//        //positions.add(new Coordinate(0,1));
+//        positions.add(new Coordinate(1,1));
+//        positions.add(new Coordinate(0,1));
+//        positions.add(new Coordinate(0,0));
+//        Coordinate head = new Coordinate(0,0);
+//        Coordinate food = new Coordinate(3,3);
+//        aStartSearch(positions, head, food, 4, 4, true, false);
+        //buildCords();
+        System.out.println(cords);
         //System.out.println(Arrays.toString(hamiltonianCycle(6, 5, true))); // should result in even number otherwise hamiltonian cycle is not possible
     }
 
@@ -154,6 +218,64 @@ public class Algorithms {
         }
         return new int[0];
     }
+    public static int[] simplifiedAStartSearch(ArrayList<Coordinate> positions, Coordinate headSnakePos, Coordinate foodPosition, int x, int y) {
+        if (positions.isEmpty()) {
+            return new int[0];
+        }
+        PriorityQueue<PQPair> pq = new PriorityQueue<>();
+        // start finding longest path if size is big enough
+        HashSet<Coordinate> visited = new HashSet<>();
+        HashMap<Coordinate, Coordinate> map = new HashMap<>();
+        map.put(headSnakePos, new Coordinate(-1,-1));
+        PQPair p = new PQPair(headSnakePos, 0);
+        pq.add(p);
+        boolean found = false;
+        while (!pq.isEmpty()) {
+            PQPair current = pq.poll();
+            if (visited.contains(current.c)) {
+                continue;
+            }
+            if (current.c.equals(foodPosition)) {
+                found = true;
+                break;
+            }
+            visited.add(current.c);
+            ArrayList<Coordinate> neighbors = getNeighbors(current.c);
+            for (int i = 0; i < neighbors.size(); i++) {
+                if (positions.contains(neighbors.get(i)) || outOfBounds(x, y, neighbors.get(i).getX(), neighbors.get(i).getY())) {
+                    neighbors.remove(neighbors.get(i));
+                    i--;
+                }
+            }
+            for (Coordinate cor : neighbors) {
+                if (!visited.contains(cor)) {
+                    map.put(cor, current.c);
+                    pq.add(new PQPair(cor, current.value+1 + distance(cor, foodPosition)));
+                }
+            }
+        }
+
+        if (found) {
+            Coordinate temp;
+            ArrayList<Coordinate> result = new ArrayList<>();
+            result.add(foodPosition);
+            temp = map.get(foodPosition);
+            while (temp != null && !temp.equals(new Coordinate(-1,-1))) {
+                result.add(temp);
+                temp = map.get(temp);
+            }
+            int[] ret = new int[result.size()-1];
+            for (int i = 0; i < result.size()-1; i++) {
+                Coordinate c1 = result.get(i);
+                Coordinate c2 = result.get(i+1);
+                ret[result.size() - 2 - i] = move(c2.getX(), c2.getY(), c1.getX(), c1.getY());
+            }
+            System.out.println(Arrays.toString(ret));
+            return ret;
+        }
+        return new int[0];
+    }
+
 
 
     private static double numberOfCellsCanReach(ArrayList<Coordinate> positions, int x, int y) {

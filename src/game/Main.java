@@ -14,5 +14,6 @@ public class Main {
 		app.setResizable(false);
 		app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		app.setBackground(Color.white);
+		System.out.println("Size" + Algorithms.randomH.length);
 	}
 }

@@ -2,6 +2,7 @@ package game;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class Game extends Thread {
@@ -119,21 +120,30 @@ public class Game extends Thread {
 	 }
 
 	private void runHamiltonianShortcutMode(int[] moves) {
+	 	Algorithms.buildCords();
 		int index = 0;
 		while(!stop){
-			directionSnake = moves[index];
-			System.out.println(directionSnake);
+			int[] m = Algorithms.getShortcutMove(index, foodPosition, positions);
+			if (m[0] != -1) {
+				System.out.println("Cutting m[1]" + m[1]);
+				directionSnake = m[0];
+				System.out.println(directionSnake);
+				index = m[1];
+			} else {
+				//System.out.println("Normal");
+				directionSnake = moves[index];
+				System.out.println(directionSnake);
+				index++;
+			}
+
+			if (index >= moves.length){
+				System.out.println("Reset");
+				index= index % moves.length;
+			}
 			moveInterne(directionSnake);
-
-
 			checkForCollision();
 			moveExterne();
 			deleteTail();
-			if (index == moves.length -1){
-				index=0;
-			} else {
-				index++;
-			}
 			pauser();
 		}
 	}
