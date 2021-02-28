@@ -269,7 +269,6 @@ public class Algorithms {
     // method that find a hamiltonian cycle
     private static int[] findH(Coordinate current, int currLen, int x, int y, int[] res, Stack<Coordinate> coordinates, boolean random) {
         if (currLen == (x*y)) {
-            System.out.println(Arrays.toString(res));
             return res;
         } else {
             coordinates.push(current);

@@ -138,11 +138,9 @@ public class Game extends Thread {
 			// if there is a shortcut move
 			if (m[0] != -1) {
 				directionSnake = m[0];
-				System.out.println(directionSnake);
 				index = m[1];
 			} else {
 				directionSnake = moves[index];
-				System.out.println(directionSnake);
 				index++;
 			}
 
@@ -187,7 +185,6 @@ public class Game extends Thread {
 	 
 	 //Stops The Game
 	 private void stopGame(){
-		 System.out.println(sizeSnake);
 		 if (sizeSnake == (App.width*App.height)) {
 			 resultText.setText("WON!");
 		 } else if (!(mode == -1)){
