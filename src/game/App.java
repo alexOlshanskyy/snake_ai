@@ -34,15 +34,15 @@ class App extends JFrame{
 		} else if (mode == 1){
 			width = 18;
 			height = 12;
-			Game.speed = 2;
+			Game.speed = 30;
 			colorRange = 225;
 			colorChange = (float)0.003;
 		} else if (mode == 0) {
 			width = 18;
 			height = 12;
-			Game.speed = 100;
-			colorRange = 1380;
-			colorChange = (float)0.0005;
+			Game.speed = 200;
+			colorRange = 225;
+			colorChange = (float)0.003;
 		} else if (mode == 3) {
 			width = 7;
 			height = 5;

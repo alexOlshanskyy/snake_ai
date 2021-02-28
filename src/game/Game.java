@@ -47,9 +47,11 @@ public class Game extends Thread {
 		 Game.resultText = resultText;
 	 }
 
+	/**
+	 * runs the game
+	 */
 	 public void run() {
 		 while(!stop){
-		 	System.out.println("This is mode: " + mode);
 		 	if (mode == -1){
 		 		stopGame();
 			} else if (mode == 0) {
@@ -65,7 +67,6 @@ public class Game extends Thread {
 	 }
 
 	private void runPathFinding() {
-	 	//boolean max = false;
 		moveInterne(directionSnake);
 		checkForCollision();
 		moveExterne();
@@ -74,17 +75,18 @@ public class Game extends Thread {
 		while(!stop){
 			int[] moves = Algorithms.aStartSearch(positions, headSnakePos, foodPosition, App.width, App.height, false, false);
 			if (moves.length == 0) {
-				System.out.println("No shortest path found");
+				//No shortest path found
 				moves = Algorithms.aStartSearch(positions, headSnakePos, foodPosition, App.width, App.height, true, false);
 			}
 			if (moves.length == 0) {
-				System.out.println("No longest path found");
+				//No longest path found
 				moves = Algorithms.aStartSearch(positions, headSnakePos, foodPosition, App.width, App.height, true, true);
 			}
 			if (moves.length == 0) {
-				System.out.println("No path found, RIP");
+				//No path found, RIP
 				runNormalMode();
 			}
+
 			for (int i = 0; i < moves.length; i++) {
 				directionSnake = moves[i];
 				moveInterne(directionSnake);
@@ -110,16 +112,16 @@ public class Game extends Thread {
 
 	 private void runHamiltonianMode(int[] moves) {
 	 	int index = 0;
-	 	System.out.println("in here");
 		 while(!stop){
 			 directionSnake = moves[index];
 			 moveInterne(directionSnake);
+
+			 // loop index around back to 0
 			 if (index == moves.length -1){
 			 	index = 0;
 			 } else {
 			 	index++;
 			 }
-
 			 checkForCollision();
 			 moveExterne();
 			 deleteTail();
@@ -132,20 +134,19 @@ public class Game extends Thread {
 		int index = 0;
 		while(!stop){
 			int[] m = Algorithms.getShortcutMove(index, foodPosition, positions);
+
+			// if there is a shortcut move
 			if (m[0] != -1) {
-				System.out.println("Cutting m[1]" + m[1]);
 				directionSnake = m[0];
 				System.out.println(directionSnake);
 				index = m[1];
 			} else {
-				//System.out.println("Normal");
 				directionSnake = moves[index];
 				System.out.println(directionSnake);
 				index++;
 			}
 
 			if (index >= moves.length){
-				System.out.println("Reset");
 				index= index % moves.length;
 			}
 			moveInterne(directionSnake);
@@ -173,14 +174,12 @@ public class Game extends Thread {
 
 			 sizeSnake=sizeSnake+1;
 			 scoreText.setText("Score: " + sizeSnake);
-			 System.out.println("got food");
 			 foodPosition = getRandNotInSnake();
 			 spawnFood(foodPosition);
 		 }
 		 for(int i = 0;i<=positions.size()-2;i++){
 			 boolean biteItself = posCritique.getX()==positions.get(i).getX() && posCritique.getY()==positions.get(i).getY();
 			 if(biteItself || stop){
-			 	System.out.println("bit");
 				 stopGame();
 			 }
 		 }
@@ -188,14 +187,12 @@ public class Game extends Thread {
 	 
 	 //Stops The Game
 	 private void stopGame(){
-		 System.out.println("end \n");
 		 System.out.println(sizeSnake);
 		 if (sizeSnake == (App.width*App.height)) {
 			 resultText.setText("WON!");
 		 } else if (!(mode == -1)){
 			 resultText.setText("LOST!");
 		 }
-
 		 while(true){
 			 pauser();
 		 }
@@ -236,6 +233,7 @@ public class Game extends Thread {
 	 }
 
 	 //1:right 2:left 3:top 4:bottom 0:nothing
+	 //this method updates the snake positions
 	 private void moveInterne(int dir){
 		 switch(dir){
 		 	case 4:
@@ -275,9 +273,8 @@ public class Game extends Thread {
 		 		 break;
 		 }
 	 }
-
+	 // moves snake in game based on positions
 	 private void moveExterne(){
-
 		 for(int i = positions.size() - 1; i >= 0; i--){
 			 int x = positions.get(i).getX();
 			 int y = positions.get(i).getY();
@@ -286,11 +283,10 @@ public class Game extends Thread {
 			 } else {
 				 Squares.get(y).get(x).setColor(3 + positions.size() - i - 1);
 			 }
-
-			 
 		 }
 	 }
 
+	 // deletes tail of a snake
 	 private void deleteTail(){
 		 int size = sizeSnake;
 		 for(int i = positions.size()-1;i>=0;i--){
