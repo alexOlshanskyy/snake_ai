@@ -18,6 +18,6 @@ In the shortcut version of Hamiltonian cycle, the cycle is followed normally, bu
 Not every cut is safe because after the cut snake can hit its tail, so algorithm checks if it is safe to cut to the food.  
 
 ### How To Run
-Clone the repo and run Main.java from IDE.
+Clone the repo and run Main.java from IDE (Requires Java Development Kit (JDK)).
 
 #### Demo: https://www.youtube.com/watch?v=TEEFZ9yv-WQ
