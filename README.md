@@ -4,7 +4,7 @@
 
 This project uses two techniques to play snake. 
 One is path finding with shortest/longest paths using A* algorithm. 
-The other is Hamiltonian cycles, which finds a cycle around the grid and follows it. 
+The other is Hamiltonian cycle, which finds a cycle around the grid and follows it. 
 
 ### Pathfinding
 
