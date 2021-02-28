@@ -13,18 +13,25 @@ public class Game extends Thread {
 	 public static int directionSnake;
 	 private static int mode;
 	 public static boolean stop = false;
-	 private static JTextArea ta;
-	private static JTextArea resTA;
+	 private static JTextArea scoreText;
+	 private static JTextArea resultText;
 	 public static boolean allowedToMove;
 
-	 ArrayList<Coordinate> positions = new ArrayList<Coordinate>();
+	 ArrayList<Coordinate> positions = new ArrayList<>();
 	 public Coordinate foodPosition;
-	 
-	 //Constructor of ControlleurThread 
+
 	 Game(Coordinate positionStart, int mode, JTextArea textArea, JTextArea textArea2){
 	 	reconstruct(positionStart, mode, textArea, textArea2);
 	 }
-	 public void reconstruct(Coordinate positionStart, int mode, JTextArea textArea, JTextArea textArea2) {
+
+	/**
+	 *
+	 * @param positionStart start position of snake
+	 * @param mode is the mode of the game
+	 * @param scoreText is the text that shows score
+	 * @param resultText is the text that shows result of the game
+	 */
+	 public void reconstruct(Coordinate positionStart, int mode, JTextArea scoreText, JTextArea resultText) {
 		 Game.mode = mode;
 		 Squares= App.Grid;
 
@@ -36,9 +43,8 @@ public class Game extends Thread {
 
 		 foodPosition= new Coordinate(App.width-1, App.height-1);
 		 spawnFood(foodPosition);
-		 ta = textArea;
-		 //ta.setText("Score: " + sizeSnake);
-		 resTA = textArea2;
+		 Game.scoreText = scoreText;
+		 Game.resultText = resultText;
 	 }
 
 	 public void run() {
@@ -166,7 +172,7 @@ public class Game extends Thread {
 		 if(eatingFood){
 
 			 sizeSnake=sizeSnake+1;
-			 ta.setText("Score: " + sizeSnake);
+			 scoreText.setText("Score: " + sizeSnake);
 			 System.out.println("got food");
 			 foodPosition = getRandNotInSnake();
 			 spawnFood(foodPosition);
@@ -185,9 +191,9 @@ public class Game extends Thread {
 		 System.out.println("end \n");
 		 System.out.println(sizeSnake);
 		 if (sizeSnake == (App.width*App.height)) {
-			 resTA.setText("WON!");
+			 resultText.setText("WON!");
 		 } else if (!(mode == -1)){
-			 resTA.setText("LOST!");
+			 resultText.setText("LOST!");
 		 }
 
 		 while(true){

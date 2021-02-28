@@ -6,6 +6,9 @@ import java.awt.event.KeyEvent;
  public class MoveListener extends KeyAdapter{
  	
  		public void keyPressed(KeyEvent e){
+			// prevents moving twice in one tick which can lead to snake hitting itself. If snake was moving in 1
+			// direction and then user quickly clicks 3 and then 2. At the end of the tick snake will move in 2
+			// direction and hit itself
  			if (!Game.allowedToMove) {
  				return;
 			}
@@ -22,7 +25,6 @@ import java.awt.event.KeyEvent;
 					}
 					break;
 				case 39:
-					//if it's not the opposite direction
 					if(Game.directionSnake!=2) {
 						Game.directionSnake=1;
 					}
@@ -35,15 +37,7 @@ import java.awt.event.KeyEvent;
 				default:
 					break;
  		    }
+ 			// lock the move
  			Game.allowedToMove = false;
  		}
-
- 		private void sleep() {
-			try {
-				Thread.sleep(15);
-			} catch (InterruptedException interruptedException) {
-				interruptedException.printStackTrace();
-			}
-		}
- 	
  }

@@ -46,7 +46,4 @@ public class Coordinate {
 	public int getManhattanDistanceTo(Coordinate c1) {
 		return (Math.abs(this.getX() - c1.getX())) + (Math.abs(this.getY() + c1.getY()));
 	}
-
-		  
-		  
 } 
