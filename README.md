@@ -13,14 +13,14 @@ Pathfinding follows this strategy:
 2. If no shortest path to food is found, snake tries to find the longest path such that after it eats the food it can access 80% of the available grid.
 3. If no path is found in 1 and 2 snake tries to find any longest path to the food.
 
-### Hamiltonian cycle
+### Hamiltonian Cycle
 
 In Hamiltonian mode snake follows the generated Hamiltonian cycle, which is slow but guaranties that snake will win.
 
 In the shortcut version of Hamiltonian cycle, the cycle is followed normally, but if adjacent cell on the grid is the food the cycle is cut. 
 Not every cut is safe because after the cut snake can hit its tail, so algorithm checks if it is safe to cut to the food.  
 
-### How To Run
+### How to Run
 
 Clone the repo and run Main.java from IDE (Requires Java Development Kit (JDK)).
 
