@@ -3,6 +3,7 @@ package game;
 import javax.swing.*;
 import java.awt.*;
 
+@SuppressWarnings("CheckStyle")
 public class Main {
 
 	public static void main(String[] args) {

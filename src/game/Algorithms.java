@@ -146,7 +146,7 @@ public class Algorithms {
      * @param any method will return any path to food regardless if it satisfies the condition. max parameter is still taken into account
      * @return an int array representing the moves in the path that method found. If no path was found, an empty array is returned
      */
-    public static int[] aStartSearch(ArrayList<Coordinate> positions, Coordinate headSnakePos, Coordinate foodPosition, int x, int y, boolean max, boolean any) {
+    public static int[] aStarSearch(ArrayList<Coordinate> positions, Coordinate headSnakePos, Coordinate foodPosition, int x, int y, boolean max, boolean any) {
         if (positions.isEmpty()) {
             return new int[0];
         }

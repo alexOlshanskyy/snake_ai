@@ -73,7 +73,7 @@ class App extends JFrame{
 
 		grid.removeAll(); // clear previous game
 		grid.setFocusable(true);
-		grid.setLayout(new GridLayout(height,width,0,0));
+		grid.setLayout(new GridLayout(height,width,2,2));
 
 
 

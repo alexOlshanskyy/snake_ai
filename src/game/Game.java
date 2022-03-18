@@ -73,14 +73,10 @@ public class Game extends Thread {
 		deleteTail();
 		pauser();
 		while(!stop){
-			int[] moves = Algorithms.aStartSearch(positions, headSnakePos, foodPosition, App.width, App.height, false, false);
+			int[] moves = Algorithms.aStarSearch(positions, headSnakePos, foodPosition, App.width, App.height, false, false);
 			if (moves.length == 0) {
-				//No shortest path found
-				moves = Algorithms.aStartSearch(positions, headSnakePos, foodPosition, App.width, App.height, true, false);
-			}
-			if (moves.length == 0) {
-				//No longest path found
-				moves = Algorithms.aStartSearch(positions, headSnakePos, foodPosition, App.width, App.height, true, true);
+				//No shortest or longest path found with 80% cells reachable
+				moves = Algorithms.aStarSearch(positions, headSnakePos, foodPosition, App.width, App.height, true, true);
 			}
 			if (moves.length == 0) {
 				//No path found, RIP
